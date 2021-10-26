@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Theme by default
+Description=by default
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/cyland
+ScriptFile=/usr/share/plymouth/themes/cyland/cyland.script
