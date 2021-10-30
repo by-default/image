@@ -1,0 +1,34 @@
+#----------------------------- Screen/window setup ---------------------------
+# Compute screen/image ratio and scale the background accordingly
+window_max.width = Window.GetX() * 2 + Window.GetWidth();
+window_max.height = Window.GetY() * 2 + Window.GetHeight();
+screen_ratio = window_max.width / window_max.height;
+small_dimension = Math.Min(window_max.width, window_max.height);
+#Debug("Window.GetX():" + Window.GetX() + ", Window.GetY():" + Window.GetY());
+#Debug("Window is [" + window_max.width + ";" + window_max.height + "], ratio=" + screen_ratio);
+
+
+#------------------------------- Background ----------------------------------------
+bg_image = Image("boot_splash.png");
+bg_image_ratio = bg_image.GetWidth() / bg_image.GetHeight();
+if (screen_ratio > bg_image_ratio)
+    bg_scale_factor = window_max.width / bg_image.GetWidth();
+else
+    bg_scale_factor = window_max.height / bg_image.GetHeight();
+scaled_bg_image = bg_image.Scale(bg_image.GetWidth() * bg_scale_factor,
+                                 bg_image.GetHeight() * bg_scale_factor);
+
+# Display background
+bg_sprite = Sprite(scaled_bg_image);
+bg_sprite.SetPosition(Window.GetX() + Window.GetWidth() / 2 - scaled_bg_image.GetWidth() / 2,
+                      Window.GetY() + Window.GetHeight() / 2 - scaled_bg_image.GetHeight() / 2,
+                      -1000);
+
+#-----------------------------------------------------------------------------
+# Top background colour
+# #489291 --> 0.282, 0.572, 0.569
+# New background colour
+# #0a3649 --> 0.039, 0.212, 0.286
+#
+Window.SetBackgroundTopColor (0.282, 0.572, 0.569);     # Nice colour on top of the screen fading to
+Window.SetBackgroundBottomColor (0.039, 0.212, 0.286);  # an equally nice colour on the bottom

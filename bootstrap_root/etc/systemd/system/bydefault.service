@@ -1,11 +1,11 @@
 [Unit]
-Description=Slow Burning open CV
+Description=Run script by default
 After=network.target
 
 [Service]
 Environment=DISPLAY=:0
-ExecStart=/bin/bash cv_test.sh
-WorkingDirectory=/home/pi
+ExecStart=/bin/bash start.sh
+WorkingDirectory=/boot/bydefault
 Restart=always
 RestartSec=2
 User=pi
