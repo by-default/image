@@ -7,12 +7,7 @@
 
 # uncomment this if your display has a black border of unused pixels visible
 # and your display can output without overscan
-disable_overscan=1
-disable_splash=1
-dtoverlay=disable-bt
-# dtoverlay=disable-wifi
-boot_delay=0
-avoid_warnings=1
+#disable_overscan=1
 
 # uncomment the following to adjust overscan. Use positive numbers if console
 # goes off screen, and negative if there is too much border
@@ -23,15 +18,15 @@ avoid_warnings=1
 
 # uncomment to force a console size. By default it will be display's size minus
 # overscan.
-#framebuffer_width=1024
-#framebuffer_height=600
+#framebuffer_width=1280
+#framebuffer_height=720
 
 # uncomment if hdmi display is not detected and composite is being output
 #hdmi_force_hotplug=1
 
 # uncomment to force a specific HDMI mode (this will force VGA)
-#hdmi_group=0
-#hdmi_mode=0
+#hdmi_group=1
+#hdmi_mode=1
 
 # uncomment to force a HDMI mode rather than DVI. This can make audio work in
 # DMT (computer monitor) modes
@@ -56,23 +51,28 @@ avoid_warnings=1
 #dtoverlay=gpio-ir,gpio_pin=17
 #dtoverlay=gpio-ir-tx,gpio_pin=18
 
+# bydefault
+# dtoverlay=disable-bt
+boot_delay=0
+avoid_warnings=1
+disable_splash=1
+disable_overscan=1
+
+#waveshare 7 inch 1024x600 display
+#hdmi_group=2
+#hdmi_mode=87
+#hdmi_cvt 1024 600 60 6 0 0 0
+#hdmi_drive=1
+
 # Additional overlays and parameters are documented /boot/overlays/README
 
 # Enable audio (loads snd_bcm2835)
 dtparam=audio=on
 
-#waveshare 7 inch 1024x600 display
-hdmi_group=2
-hdmi_mode=87
-hdmi_cvt 1024 600 60 6 0 0 0
-hdmi_drive=1
-
 [pi4]
 # Enable DRM VC4 V3D driver on top of the dispmanx display stack
-#dtoverlay=vc4-fkms-v3d
+dtoverlay=vc4-fkms-v3d
 max_framebuffers=2
 
 [all]
-#dtoverlay=vc4-fkms-v3d
-[all]
-dtoverlay=vc4-kms-v3d
+dtoverlay=vc4-fkms-v3d

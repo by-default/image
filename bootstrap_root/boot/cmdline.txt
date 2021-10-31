@@ -1,1 +1,1 @@
-console=tty3 root=PARTUUID=92b6dd46-02 rootfstype=ext4 elevator=deadline fsck.repair=yes quiet splash plymouth.ignore-serial-consoles loglevel=0 vt.global_cursor_default=0 rootwait usbhid.mousepoll=0
+console=tty3 root=PARTUUID=dd6d92e9-02 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait fastboot noswap ro quiet splash plymouth.ignore-serial-consoles loglevel=0 vt.global_cursor_default=0 usbhid.mousepoll=0

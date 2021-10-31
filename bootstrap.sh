@@ -55,11 +55,12 @@ sudo apt install chromium omxplayer vlc xdotool imagemagick ntpdate git
 
 # update plymouth
 sudo apt install libudev-dev libdrm-dev xsltproc
-git clone git@gitlab.freedesktop.org:plymouth/plymouth.git
+git clone https://gitlab.freedesktop.org/plymouth/plymouth.git
 cd plymouth/
 ./autogen.sh
 ./configure --disable-documentation
 make
+sudo make install
 # copy a theme
 sudo plymouth-set-default-theme bydefault
 
@@ -68,6 +69,9 @@ sudo plymouth-set-default-theme bydefault
 1. boot up
 2. creating and mounting data partition
 3. run chrome, check webgl
+4. running apt upgrade
 4. check glxgears
 5. run omxplayer, video and audio
 6. omxplayer-sync
+
+# chromium --kiosk --use-fake-ui-for-media-stream /data/ga-mimicry-cam.html

@@ -11,5 +11,5 @@ RestartSec=2
 User=pi
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=graphical.target
 

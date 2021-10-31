@@ -32,3 +32,31 @@ bg_sprite.SetPosition(Window.GetX() + Window.GetWidth() / 2 - scaled_bg_image.Ge
 #
 Window.SetBackgroundTopColor (0.282, 0.572, 0.569);     # Nice colour on top of the screen fading to
 Window.SetBackgroundBottomColor (0.039, 0.212, 0.286);  # an equally nice colour on the bottom
+
+fun refresh_callback() {
+    # (Normally)Currently we do nothing here
+    bg_sprite = Sprite(scaled_bg_image);
+    bg_sprite.SetPosition(Window.GetX() + Window.GetWidth() / 2 - scaled_bg_image.GetWidth() / 2,
+    Window.GetY() + Window.GetHeight() / 2 - scaled_bg_image.GetHeight() / 2,
+    -1000);
+}
+Plymouth.SetRefreshFunction(refresh_callback);
+Plymouth.SetDisplayNormalFunction(refresh_callback);
+
+fun update_status_callback(status) {
+    # (Normally)Currently we do nothing here
+    bg_sprite = Sprite(scaled_bg_image);
+    bg_sprite.SetPosition(Window.GetX() + Window.GetWidth() / 2 - scaled_bg_image.GetWidth() / 2,
+    Window.GetY() + Window.GetHeight() / 2 - scaled_bg_image.GetHeight() / 2,
+    -1000);
+}
+Plymouth.SetUpdateStatusFunction(update_status_callback);
+
+fun boot_progress_callback(a, b) {
+    # (Normally)Currently we do nothing here
+    bg_sprite = Sprite(scaled_bg_image);
+    bg_sprite.SetPosition(Window.GetX() + Window.GetWidth() / 2 - scaled_bg_image.GetWidth() / 2,
+    Window.GetY() + Window.GetHeight() / 2 - scaled_bg_image.GetHeight() / 2,
+    -1000);
+}
+Plymouth.SetBootProgressFunction(boot_progress_callback);
