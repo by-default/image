@@ -58,11 +58,13 @@ avoid_warnings=1
 disable_splash=1
 disable_overscan=1
 
+[EDID=DWE-HDMI]
 #waveshare 7 inch 1024x600 display
-#hdmi_group=2
-#hdmi_mode=87
-#hdmi_cvt 1024 600 60 6 0 0 0
-#hdmi_drive=1
+hdmi_group=2
+hdmi_mode=87
+hdmi_cvt 1024 600 60 6 0 0 0
+hdmi_drive=1
+[all]
 
 # Additional overlays and parameters are documented /boot/overlays/README
 
