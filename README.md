@@ -1,4 +1,4 @@
-1. Образ запускается с параметрами /boot/cmdline.txt и /boot/config.txt
+1. Образ запускается с параметрами `/boot/cmdline.txt` и `/boot/config.txt`
 	* При старте образа показывается экран plymouth (параметры `quiet splash`). Фон лежит в `/usr/local/share/plymouth/themes/bydefault/boot_splash.png`, рядом лежит скрипт plymouth
 	* По-умолчанию системный UART отключен от системной консоли
 2. `/boot` и `/` монтируются read-only, все каталоги, требующие записи (временные файлы, логи и т.д.) монтируются как tmpfs (в RAM). Параметры монтирования в `/etc/fstab`. Для переключения в режим read-write и обратно используются алиасы `set_rw` и `set_ro` (задаются в `/home/pi/.bashrc`)
