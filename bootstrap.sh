@@ -60,10 +60,25 @@ cd plymouth/
 ./autogen.sh
 ./configure --disable-documentation
 make
+cd ..
 sudo make install
 # copy a theme
 sudo plymouth-set-default-theme bydefault
+rm -rf plymouth/
 
+sudo apt install golang libasound2-dev
+git clone https://github.com/sqshq/sampler.git
+cd sampler/
+go build
+sudo mv sampler /usr/bin/
+cd ..
+rm -rf sampler
+sudo rm -rf go
+
+pip3 install netifaces
+sudo systemctl enable bydefault.service
+sudo systemctl enable create-data.service
+sudo systemctl enable dashboard.service
 
 # tests
 1. boot up
