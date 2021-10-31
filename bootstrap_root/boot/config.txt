@@ -66,6 +66,16 @@ hdmi_cvt 1024 600 60 6 0 0 0
 hdmi_drive=1
 [all]
 
+gpio=21=ip,pu
+
+[gpio21=1]
+#normal operation
+cmdline=cmdline.txt
+[gpio21=0]
+#debug boot
+cmdline=cmdline.debug.txt
+[all]
+
 # Additional overlays and parameters are documented /boot/overlays/README
 
 # Enable audio (loads snd_bcm2835)
