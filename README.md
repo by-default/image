@@ -1,5 +1,5 @@
 1. Образ запускается с параметрами `/boot/cmdline.txt` и `/boot/config.txt`
-	* При старте образа показывается экран plymouth (параметры `quiet splash`). Фон лежит в `/usr/local/share/plymouth/themes/bydefault/boot_splash.png`, рядом лежит скрипт plymouth
+	* При старте образа показывается экран plymouth (благодаря параметрам ядра `quiet splash`). Фон лежит в `/usr/local/share/plymouth/themes/bydefault/boot_splash.png`, рядом лежит скрипт plymouth
 	* По-умолчанию системный UART отключен от системной консоли
 2. `/boot` и `/` монтируются read-only, все каталоги, требующие записи (временные файлы, логи и т.д.) монтируются как tmpfs (в RAM). Параметры монтирования в `/etc/fstab`. Для переключения в режим read-write и обратно используются алиасы `set_rw` и `set_ro` (задаются в `/home/pi/.bashrc`)
 3. При первом запуске на остатке sd-карты создается FAT32 раздел, который монтируется в `/data` как read-write, предназначенный для записи данных, медиафайлов и т.д. Создание обеспечивается скриптом `/usr/bin/create_data`, запускающийся one-time сервисом `/etc/systemd/system/create-data.service`. Этот же скрипт устанавливает права на папку `/tmp`.
