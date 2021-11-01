@@ -1,4 +1,8 @@
 #!/bin/bash
+
+SCRIPT=$(readlink -f $0)
+SCRIPT_DIR=$(dirname $SCRIPT)
+
 trap ctrl_c INT
 
 function find_usbflash {
@@ -7,7 +11,12 @@ function find_usbflash {
 
 function ctrl_c() {
     echo "go away by default"
-    killall omxplayer
+
+    if ps -p $USB_SCRIPT > /dev/null; then
+        kill $USB_SCRIPT
+    fi
+    
+    killall omxplayer.bin
     cd /
     if [[ -z $(find_usbflash) ]]; then
         sudo umount $USBFLASH_DIR
@@ -15,28 +24,28 @@ function ctrl_c() {
     exit 0
 }
 
+list_descendants () {
+  local children=$(ps -o pid= --ppid "$1")
+
+  for pid in $children; do
+    list_descendants "$pid"
+  done
+
+  echo "$children"
+}
+
+sudo bash -c "echo none >/sys/class/leds/led0/trigger"
+
 function default {
     # echo "Default script, do nothing, wait for usb"
-    $()
+    # short blink led
+    sudo bash -c "echo 1 >/sys/class/leds/led0/brightness"
+    sleep 0.5s
+    sudo bash -c "echo 0 >/sys/class/leds/led0/brightness"
+    sleep 0.5s
 }
 
 USBFLASH_DIR=/usbflash
-
-function default_usb {
-    echo "Default usb script, play all by omxplayer"
-    while true; do
-        for file in /usbflash/*; do
-            # check flash exists to stop playback
-            if [[ ! -z $(find_usbflash) ]]; then
-                echo "play $file"
-                omxplayer "$file"
-            else
-                return
-            fi
-        done
-        sleep 1s
-    done
-}
 
 function mount_flash {
     if [[ ! -z $(find_usbflash) ]] && \
@@ -48,21 +57,38 @@ function mount_flash {
         cd $USBFLASH_DIR
         if [ -a "start.sh" ]; then
             echo "start script exists, run"
-            ./start.sh
+            ./start.sh & USB_SCRIPT=$!
         else
             # echo "no start script, run default on usb"
-            default_usb
+            $SCRIPT_DIR/default_usb.sh & USB_SCRIPT=$!
         fi
 
+        # wait for process exists and flash inserted
+        while ps -p $USB_SCRIPT > /dev/null && [[ ! -z $(find_usbflash) ]]; do
+            sudo bash -c "echo 1 >/sys/class/leds/led0/brightness"
+            sleep 0.01s
+            sudo bash -c "echo 0 >/sys/class/leds/led0/brightness"
+            sleep 2s
+        done
+
+        echo "end of process or eject flash"
+
+        if ps -p $USB_SCRIPT > /dev/null; then
+            echo "kill $USB_SCRIPT"
+            kill $(list_descendants $USB_SCRIPT)
+            kill $USB_SCRIPT
+        fi
+        
         cd /
         if [[ -z $(find_usbflash) ]]; then
             echo "flash ejected"
+            
             sudo umount $USBFLASH_DIR
         fi
     else
         if [[ -z "$USBFLASH" ]]; then $()
         elif [[ ! -d "$USBFLASH_DIR" ]]; then echo "$USBFLASH_DIR not exists";
-        elif [[ ! -z $(mount | grep /dev/sda1) ]]; then echo "not already mounted";
+        elif [[ ! -z $(mount | grep $(find_usbflash)) ]]; then echo "not already mounted";
         else echo "mount failed"; fi
         
         default
@@ -74,5 +100,5 @@ echo "Start script by default"
 # try to mount flash infinite
 while true; do
     mount_flash
-    sleep 1s
+    sleep 0.1s
 done
