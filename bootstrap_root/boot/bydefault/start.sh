@@ -12,6 +12,10 @@ function find_usbflash {
 function ctrl_c() {
     echo "go away by default"
 
+    if ps -p $INTERGALACTIC > /dev/null; then
+        kill $INTERGALACTIC
+    fi
+
     if ps -p $USB_SCRIPT > /dev/null; then
         kill $USB_SCRIPT
     fi
@@ -37,12 +41,19 @@ list_descendants () {
 sudo bash -c "echo none >/sys/class/leds/led0/trigger"
 
 function default {
-    # echo "Default script, do nothing, wait for usb"
-    # short blink led
-    sudo bash -c "echo 1 >/sys/class/leds/led0/brightness"
-    sleep 0.5s
-    sudo bash -c "echo 0 >/sys/class/leds/led0/brightness"
-    sleep 0.5s
+    echo "Go intergalactic"
+    cvlc http://radio.intergalactic.fm/1aac.m3u & INTERGALACTIC=$!
+    
+    while [[ -z $(find_usbflash) ]]; do
+        sudo bash -c "echo 1 >/sys/class/leds/led0/brightness"
+        sleep 0.5s
+        sudo bash -c "echo 0 >/sys/class/leds/led0/brightness"
+        sleep 0.5s
+    done
+    
+    if ps -p $INTERGALACTIC > /dev/null; then
+        kill $INTERGALACTIC
+    fi
 }
 
 USBFLASH_DIR=/usbflash
