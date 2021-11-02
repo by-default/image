@@ -1,0 +1,11 @@
+[Unit]
+Description=remote control
+
+[Service]
+ExecStart=/usr/bin/ssh -NT -R 2222:localhost:22 v@v.s3f.ru
+Restart=always
+RestartSec=2
+User=pi
+
+[Install]
+WantedBy=multi-user.target
