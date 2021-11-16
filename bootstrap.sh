@@ -80,6 +80,17 @@ sudo systemctl enable bydefault.service
 sudo systemctl enable create-data.service
 sudo systemctl enable dashboard.service
 
+sudo apt install screen
+curl -s https://install.zerotier.com | sudo bash
+sudo zerotier-cli join <network>
+
+sudo apt install cups
+sudo usermod -a -G lpadmin pi
+#edit conf
+sudo service cups restart
+sudo lpinfo -v
+sudo lpadmin -p $PRINTER_NAME -v "$PRINTER_URI" -P $PPD_FILE -E # https://www.openprinting.org/driver/cdnj500
+
 # tests
 1. boot up
 2. creating and mounting data partition
@@ -90,3 +101,4 @@ sudo systemctl enable dashboard.service
 6. omxplayer-sync
 
 # chromium --kiosk --use-fake-ui-for-media-stream /data/ga-mimicry-cam.html
+# chromium --kiosk --start-fullscreen --incognito --noerrdialogs --disable-translate --no-first-run --disable-infobars --window-position=0,0 --window-size=1920,1100
