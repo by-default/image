@@ -61,7 +61,7 @@ USBFLASH_DIR=/usbflash
 function mount_flash {
     if [[ ! -z $(find_usbflash) ]] && \
        [[ -d "$USBFLASH_DIR" ]] && \
-       ([[ ! -z $(mount | grep $(find_usbflash)) ]] || sudo mount $(find_usbflash) $USBFLASH_DIR -o ro,uid=$USER,gid=$USER);
+       ([[ ! -z $(mount | grep $(find_usbflash)) ]] || sudo mount $(find_usbflash) $USBFLASH_DIR -o rw,uid=$USER,gid=$USER);
     then
 
         echo "$USBFLASH connected and mounted"
