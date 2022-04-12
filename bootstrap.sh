@@ -81,6 +81,7 @@ sudo systemctl enable create-data.service
 sudo systemctl enable dashboard.service
 
 sudo apt install screen
+sudo ntpdate -s time.nist.gov
 curl -s https://install.zerotier.com | sudo bash
 sudo zerotier-cli join <network>
 
