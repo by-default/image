@@ -42,7 +42,7 @@ sudo bash -c "echo none >/sys/class/leds/led0/trigger"
 
 function default {
     echo "Go intergalactic"
-    cvlc http://radio.intergalactic.fm/1aac.m3u & INTERGALACTIC=$!
+    # cvlc http://radio.intergalactic.fm/1aac.m3u & INTERGALACTIC=$!
     
     while [[ -z $(find_usbflash) ]]; do
         sudo bash -c "echo 1 >/sys/class/leds/led0/brightness"
