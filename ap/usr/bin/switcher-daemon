@@ -24,6 +24,9 @@ if [[ ! -d /sys/class/gpio/gpio$PIN ]]; then
 fi
 
 while true; do
+	raspi-gpio set $LED_AP dl
+	raspi-gpio set $LED_STA dh
+	
     # wait for gpio pull
     while [[ $(cat /sys/class/gpio/gpio$PIN/value) == "1" ]]; do sleep 1s; done
     echo "go to ap"
