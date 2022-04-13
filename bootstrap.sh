@@ -92,6 +92,15 @@ sudo service cups restart
 sudo lpinfo -v
 sudo lpadmin -p $PRINTER_NAME -v "$PRINTER_URI" -P $PPD_FILE -E # https://www.openprinting.org/driver/cdnj500
 
+# AP
+sudo apt install hostapd
+sudo apt install dnsmasq
+sudo systemctl unmask hostapd
+sudo systemctl disable hostapd
+sudo systemctl disable dnsmasq
+sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig
+sudo rfkill unblock wlan
+
 # tests
 1. boot up
 2. creating and mounting data partition
