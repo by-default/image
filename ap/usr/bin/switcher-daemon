@@ -1,0 +1,41 @@
+#!/bin/bash
+
+#!/bin/bash
+
+PIN=19
+LED_STA=10
+LED_AP=9
+
+trap ctrl_c INT
+function ctrl_c() {
+    echo "go away by default"
+    if [[ -d /sys/class/gpio/gpio$PIN ]]; then
+        echo $PIN >/sys/class/gpio/unexport
+    fi
+    exit 0
+}
+
+raspi-gpio set $PIN ip pu
+raspi-gpio set $LED_STA op
+raspi-gpio set $LED_AP op
+
+if [[ ! -d /sys/class/gpio/gpio$PIN ]]; then
+    echo $PIN >/sys/class/gpio/export
+fi
+
+while true; do
+    # wait for gpio pull
+    while [[ $(cat /sys/class/gpio/gpio$PIN/value) == "1" ]]; do sleep 1s; done
+    echo "go to ap"
+    raspi-gpio set $LED_STA op dl
+    switch-ap
+    raspi-gpio set $LED_AP dh
+
+    # wait for gpio release
+    while [[ $(cat /sys/class/gpio/gpio$PIN/value) == "0" ]]; do sleep 1s; done
+    echo "go to station mode"
+    raspi-gpio set $LED_AP dl
+    switch-sta
+    raspi-gpio set $LED_STA dh
+
+done

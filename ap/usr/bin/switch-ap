@@ -1,8 +1,10 @@
 #!/bin/bash
 
-cp /etc/dhcpcd.conf.ap /etc/dhcpcd.conf
-systemctl daemon-reload 
-service dhcpcd restart
+set-rw
+sudo cp /etc/dhcpcd.conf.ap /etc/dhcpcd.conf
+set-ro
+sudo systemctl daemon-reload 
+sudo service dhcpcd restart
 
-service dnsmasq  start
-service hostapd start
+sudo service dnsmasq  start
+sudo service hostapd start

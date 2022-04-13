@@ -1,9 +1,11 @@
 #!/bin/bash
 
-service hostapd stop
-service dnsmasq  stop
+sudo service hostapd stop
+sudo service dnsmasq  stop
 
-cp /etc/dhcpcd.conf.sta /etc/dhcpcd.conf
-systemctl daemon-reload 
-service dhcpcd restart
+set-rw
+sudo cp /etc/dhcpcd.conf.sta /etc/dhcpcd.conf
+set-ro
+sudo systemctl daemon-reload 
+sudo service dhcpcd restart
 
