@@ -1,0 +1,8 @@
+#!/bin/bash
+
+cp /etc/dhcpcd.conf.ap /etc/dhcpcd.conf
+systemctl daemon-reload 
+service dhcpcd restart
+
+service dnsmasq  start
+service hostapd start
