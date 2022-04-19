@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo python /opt/supplicant/update_supplicant.py -t /etc/wpa_supplicant/wpa_supplicant.conf.template -s /etc/wpa_supplicant/wpa_supplicant.conf $1
