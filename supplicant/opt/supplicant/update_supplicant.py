@@ -38,6 +38,8 @@ def write_new_supplicant(filename, _header, _all_networks):
                 f.write('\tkey_mgmt=WPA-PSK\n')
             else:
                 f.write('\tkey_mgmt=NONE\n')
+            if 'priority' in network:
+                f.write('\tpriority=1\n')
             f.write('}\n')
 
 
@@ -55,8 +57,9 @@ def get_input_network(filename):
             res[key] = value
 
     if "ssid" not in res:
-        res = None
+        return None
 
+    res["priority"] = 1
     return res
 
 def get_supplicant(filename):
