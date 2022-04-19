@@ -74,6 +74,12 @@ function mount_flash {
             $SCRIPT_DIR/default_usb.sh & USB_SCRIPT=$!
         fi
 
+        if [ -a "wifi" ]; then
+            echo "update supplicant"
+            update-supplicant ./wifi
+            sudo wpa_cli -i wlan0 reconfigure
+        fi
+
         # wait for process exists and flash inserted
         while ps -p $USB_SCRIPT > /dev/null && [[ ! -z $(find_usbflash) ]]; do
             sudo bash -c "echo 1 >/sys/class/leds/led0/brightness"

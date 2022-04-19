@@ -44,7 +44,7 @@ def write_new_supplicant(filename, _header, _all_networks):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-i", help="input file", required = True)
+parser.add_argument("i", help="input file", type=str, nargs='?')
 parser.add_argument("-s", help="supplicant file", required = True)
 parser.add_argument("-t", help="template file", required = True)
 args = parser.parse_args()
@@ -87,13 +87,22 @@ def get_supplicant(filename):
     return (all_networks, header)
 
 all_networks, _ = get_supplicant(args.s)
-input_network = get_input_network(args.i)
+
+if args.i is not None:
+    input_network = get_input_network(args.i)
+else:
+    input_network = None
 
 if input_network is None:
     updated = True
     print(f'write {args.t} to {args.s}')
     template_networks, header = get_supplicant(args.t)
-    write_new_supplicant(args.s, header, template_networks)
+    try:
+        os.system("set-rw")
+        write_new_supplicant(args.s, header, template_networks)
+    finally:
+        os.system("set-ro")
+
 else:
     _, updated = update_supplicant(input_network, all_networks)
 
@@ -106,7 +115,6 @@ else:
         try:
             os.system("set-rw")
             write_new_supplicant(args.s, header, networks)
-            os.system("sudo wpa_cli -i wlan0 reconfigure")
         finally:
             os.system("set-ro")
     else:
