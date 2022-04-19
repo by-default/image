@@ -35,8 +35,8 @@ def write_new_supplicant(_supplicant_file, _header, _all_networks):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-i", help="input file")
-parser.add_argument("-s", help="supplicant file")
+parser.add_argument("-i", help="input file", required = True)
+parser.add_argument("-s", help="supplicant file", required = True)
 args = parser.parse_args()
 input_file = args.i
 supplicant_file = args.s
