@@ -8,16 +8,22 @@ def parse_line(_line):
     _value = _line[equal_index + 1:].strip().strip("\"")
     return _key, _value
 
-
 def update_supplicant(_new_network, _all_networks):
     updated = False
+    exist = False
     for key, value in enumerate(_all_networks):
         if value['ssid'] == _new_network['ssid']:
-            _all_networks[key] = _new_network
-            updated = True
-    if not updated:
+            exist = True
+            if value.get("psk") != _new_network.get("psk"):
+                print(f"update {value['ssid']}")
+                _all_networks[key] = _new_network
+                updated = True
+
+    if not exist:
         _all_networks.append(_new_network)
-    return _all_networks
+        updated = True
+
+    return (_all_networks, updated)
 
 
 def write_new_supplicant(_supplicant_file, _header, _all_networks):
@@ -38,35 +44,47 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-i", help="input file", required = True)
 parser.add_argument("-s", help="supplicant file", required = True)
 args = parser.parse_args()
-input_file = args.i
-supplicant_file = args.s
 
-input_network = {}
-with open(input_file) as f:
-    for line in f:
-        key, value = parse_line(line)
-        input_network[key] = value
+def get_input_network(filename):
+    res = {}
+    with open(filename) as f:
+        for line in f:
+            key, value = parse_line(line)
+            res[key] = value
 
-all_networks = []
-header = ''
-with open(supplicant_file) as f:
-    is_header = True
-    network = {}
-    for line in f:
-        if is_header:
-            if not str(line).startswith('network'):
-                header += line
+    if "ssid" not in res:
+        raise BaseException("wrong input format")
+
+    return res
+
+def get_supplicant(filename):
+    all_networks = []
+    header = ''
+    with open(filename) as f:
+        is_header = True
+        network = {}
+        for line in f:
+            if is_header:
+                if not str(line).startswith('network'):
+                    header += line
+                else:
+                    is_header = False
             else:
-                is_header = False
-        else:
-            if not str(line).startswith('network') and not str(line).startswith('}'):
-                key, value = parse_line(line)
-                network[key] = value
-            elif str(line).startswith('}'):
-                all_networks.append(network)
-                network = {}
+                if not str(line).startswith('network') and not str(line).startswith('}'):
+                    key, value = parse_line(line)
+                    network[key] = value
+                elif str(line).startswith('}'):
+                    all_networks.append(network)
+                    network = {}
+    return (all_networks, header)
 
-all_networks = update_supplicant(input_network, all_networks)
-write_new_supplicant(supplicant_file, header, all_networks)
+all_networks, header = get_supplicant(args.s)
+input_network = get_input_network(args.i)
 
-print(f'updated {supplicant_file} from {input_file} .. or not')
+all_networks, updated = update_supplicant(input_network, all_networks)
+
+if updated:
+    print(f'updated {args.s} from {args.i}')
+    write_new_supplicant(args.s, header, all_networks)
+else:
+    print("no need to update")
