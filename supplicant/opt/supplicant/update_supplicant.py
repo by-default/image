@@ -26,8 +26,8 @@ def update_supplicant(_new_network, _all_networks):
     return (_all_networks, updated)
 
 
-def write_new_supplicant(_supplicant_file, _header, _all_networks):
-    with open(_supplicant_file, 'w') as f:
+def write_new_supplicant(filename, _header, _all_networks):
+    with open(filename, 'w') as f:
         f.write(_header)
         for network in _all_networks:
             f.write('network={\n')
@@ -43,6 +43,7 @@ def write_new_supplicant(_supplicant_file, _header, _all_networks):
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", help="input file", required = True)
 parser.add_argument("-s", help="supplicant file", required = True)
+parser.add_argument("-t", help="template file", required = True)
 args = parser.parse_args()
 
 def get_input_network(filename):
@@ -53,7 +54,7 @@ def get_input_network(filename):
             res[key] = value
 
     if "ssid" not in res:
-        raise BaseException("wrong input format")
+        res = None
 
     return res
 
@@ -64,6 +65,9 @@ def get_supplicant(filename):
         is_header = True
         network = {}
         for line in f:
+            if line.strip().startswith("#"):
+                continue
+
             if is_header:
                 if not str(line).startswith('network'):
                     header += line
@@ -78,13 +82,22 @@ def get_supplicant(filename):
                     network = {}
     return (all_networks, header)
 
-all_networks, header = get_supplicant(args.s)
+all_networks, _ = get_supplicant(args.s)
 input_network = get_input_network(args.i)
 
-all_networks, updated = update_supplicant(input_network, all_networks)
-
-if updated:
-    print(f'updated {args.s} from {args.i}')
-    write_new_supplicant(args.s, header, all_networks)
+if input_network is None:
+    updated = True
+    print(f'write {args.t} to {args.s}')
+    template_networks, header = get_supplicant(args.t)
+    write_new_supplicant(args.s, header, template_networks)
 else:
-    print("no need to update")
+    _, updated = update_supplicant(input_network, all_networks)
+
+    if updated:
+        print(f'updated {args.s} from {args.i} with {args.t}')
+
+        template_networks, header = get_supplicant(args.t)
+        networks, updated = update_supplicant(input_network, template_networks)
+        write_new_supplicant(args.s, header, networks)
+    else:
+        print("no need to update")
