@@ -1,4 +1,5 @@
 import argparse
+import os
 # >python3 update_supplicant.py -i test_input -s test_supplicant_file
 
 
@@ -98,6 +99,12 @@ else:
 
         template_networks, header = get_supplicant(args.t)
         networks, updated = update_supplicant(input_network, template_networks)
-        write_new_supplicant(args.s, header, networks)
+
+        try:
+            os.system("set-rw")
+            write_new_supplicant(args.s, header, networks)
+            os.system("sudo wpa_cli -i wlan0 reconfigure")
+        finally:
+            os.system("set-ro")
     else:
         print("no need to update")
