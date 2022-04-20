@@ -101,6 +101,8 @@ sudo systemctl disable dnsmasq
 sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig
 sudo rfkill unblock wlan
 
+sudo apt install avahi-utils
+
 # tests
 1. boot up
 2. creating and mounting data partition

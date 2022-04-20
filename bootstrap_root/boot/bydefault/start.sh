@@ -80,6 +80,20 @@ function mount_flash {
             sudo wpa_cli -i wlan0 reconfigure
         fi
 
+        if [ -a "hostname" ]; then
+            echo "update hostname to $(cat hostname)"
+            set-rw
+            sudo hostnamectl set-hostname $(cat hostname)
+            sudo sed -i '/127.0.1.1/d' /etc/hosts
+            sudo bash -c "echo '127.0.1.1 $(cat hostname)' >> /etc/hosts"
+            sudo bash -c "echo '127.0.1.1 $(cat hostname).local' >> /etc/hosts"
+            set-ro
+            sudo avahi-set-host-name $(cat hostname)
+
+            # TODO restart AP if AP is running
+        fi
+
+
         # wait for process exists and flash inserted
         while ps -p $USB_SCRIPT > /dev/null && [[ ! -z $(find_usbflash) ]]; do
             sudo bash -c "echo 1 >/sys/class/leds/led0/brightness"
@@ -117,5 +131,5 @@ echo "Start script by default"
 # try to mount flash infinite
 while true; do
     mount_flash
-    sleep 0.1s
+    sleep 1s
 done
