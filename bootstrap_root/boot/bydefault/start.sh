@@ -80,17 +80,36 @@ function mount_flash {
             sudo wpa_cli -i wlan0 reconfigure
         fi
 
-        if [ -a "hostname" ]; then
-            echo "update hostname to $(cat hostname)"
-            set-rw
-            sudo hostnamectl set-hostname $(cat hostname)
-            sudo sed -i '/127.0.1.1/d' /etc/hosts
-            sudo bash -c "echo '127.0.1.1 $(cat hostname)' >> /etc/hosts"
-            sudo bash -c "echo '127.0.1.1 $(cat hostname).local' >> /etc/hosts"
-            set-ro
-            sudo avahi-set-host-name $(cat hostname)
+        if [ -a "config" ]; then
+            source ./config
 
-            # TODO restart AP if AP is running
+            if [[ -n "${HOSTNAME}" ]]; then
+                echo "update hostname to $HOSTNAME"
+                set-rw
+                sudo hostnamectl set-hostname $HOSTNAME
+                sudo sed -i '/127.0.1.1/d' /etc/hosts
+                sudo bash -c "echo '127.0.1.1 $HOSTNAME' >> /etc/hosts"
+                sudo bash -c "echo '127.0.1.1 $HOSTNAME.local' >> /etc/hosts"
+                set-ro
+                sudo avahi-set-host-name $HOSTNAME
+
+                # update AP name
+                
+                if [ -a "/etc/hostapd/hostapd.conf" ]; then
+                    echo "change ap ssid"
+                    sudo sed -i '/ssid/d' /etc/hostapd/hostapd.conf
+                    sudo bash -c "echo 'ssid=$HOSTNAME' >> /etc/hostapd/hostapd.conf"
+
+                    if [[ -n "${AP_PASS}" ]]; then
+                        echo "change ap password"
+                        set-rw
+                        sudo sed -i '/wpa_passphrase/d' /etc/hostapd/hostapd.conf
+                        sudo bash -c "echo 'wpa_passphrase=$AP_PASS' >> /etc/hostapd/hostapd.conf"
+                        set-ro
+                    fi
+                    # TODO restart AP if AP is running
+                fi
+            fi
         fi
 
 
