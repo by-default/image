@@ -25,10 +25,17 @@ fi
 
 while true; do
 	raspi-gpio set $LED_AP dl
-	raspi-gpio set $LED_STA dh
 	
-    # wait for gpio pull
-    while [[ $(cat /sys/class/gpio/gpio$PIN/value) == "1" ]]; do sleep 1s; done
+    # wait for gpio pull and check network
+    while [[ $(cat /sys/class/gpio/gpio$PIN/value) == "1" ]]; do
+        if [[ ! $(iwgetid -r) ]]; then
+            raspi-gpio set $LED_STA dl
+        fi
+        sleep 0.5s
+        raspi-gpio set $LED_STA dh
+        sleep 0.5s
+    done
+
     echo "go to ap"
     raspi-gpio set $LED_STA op dl
     switch-ap
@@ -39,6 +46,7 @@ while true; do
     echo "go to station mode"
     raspi-gpio set $LED_AP dl
     switch-sta
-    raspi-gpio set $LED_STA dh
+    
+
 
 done
