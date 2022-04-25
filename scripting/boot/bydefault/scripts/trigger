@@ -1,0 +1,54 @@
+#!/bin/bash
+if [[ -z "${PLAY_COMMAND}" ]]; then
+    PLAY_COMMAND=aplaymidi
+fi
+if [[ -z "${PLAY_PARAM}" ]]; then
+    PLAY_PARAM="-p $(aplaymidi -l | grep ":" | grep -v "Midi Through" | cut -d " " -f 2)"
+fi
+if [[ -z "${PLAY_INTRO}" ]]; then
+    PLAY_INTRO="intro.mid"
+fi
+if [[ -z "${PLAY_IDLE_LOOP}" ]]; then
+    PLAY_IDLE_LOOP="idle.mid"
+fi
+if [[ -z "${PLAY_MAIN}" ]]; then
+    PLAY_MAIN="main"
+fi
+if [[ -z "${SENSOR}" ]]; then
+    SENSOR="27"
+fi
+
+echo "Trigger script: $PLAY_COMMAND $PLAY_PARAM. Intro: $PLAY_INTRO. Main: $PLAY_MAIN. Sensor: $SENSOR"
+
+raspi-gpio set $SENSOR ip pd
+if [[ ! -d /sys/class/gpio/gpio$SENSOR ]]; then
+    echo $SENSOR >/sys/class/gpio/export
+fi
+
+$PLAY_COMMAND $PLAY_PARAM ./$PLAY_INTRO
+
+function play_idle_loop {
+    while true; do
+        $PLAY_COMMAND $PLAY_PARAM ./$PLAY_IDLE_LOOP
+    done
+}
+
+while true; do
+    # play intro, wait for sensor
+    while [[ $(cat /sys/class/gpio/gpio$SENSOR/value) == "0" ]]; do
+        echo "play idle loop: $PLAY_IDLE_LOOP"
+        play_idle_loop & IDLE_LOOP=$!
+
+        while [[ $(cat /sys/class/gpio/gpio$SENSOR/value) == "0" ]]; do sleep 0.2s; done
+        kill $IDLE_LOOP
+    done
+
+    # play dir, check sensor
+    for f in ./$PLAY_MAIN/*.mid; do
+        echo "play main: $f"
+        $PLAY_COMMAND $PLAY_PARAM "$f"
+        if [[ $(cat /sys/class/gpio/gpio$SENSOR/value) == "0" ]]; then
+            break
+        fi
+    done
+done
