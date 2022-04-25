@@ -1,0 +1,6 @@
+#!/bin/bash
+ 
+echo "No action, just blink the led"
+while true; do
+    sleep 1s
+done

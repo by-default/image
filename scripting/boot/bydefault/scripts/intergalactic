@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Go intergalactic"
+cvlc http://radio.intergalactic.fm/1aac.m3u
