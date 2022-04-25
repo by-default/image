@@ -19,14 +19,20 @@ list_descendants () {
   echo "$children"
 }
 
+function kill_main_script {
+    if [[ -n "${MAIN_SCRIPT}" ]]; then 
+        if ps -p $MAIN_SCRIPT > /dev/null; then
+            echo "kill $MAIN_SCRIPT"
+            kill $(list_descendants $MAIN_SCRIPT)
+            kill $MAIN_SCRIPT
+        fi
+    fi
+}
+
 function ctrl_c() {
     echo "go away by default"
 
-    if ps -p $MAIN_SCRIPT > /dev/null; then
-        echo "kill $MAIN_SCRIPT"
-        kill $(list_descendants $MAIN_SCRIPT)
-        kill $MAIN_SCRIPT
-    fi
+    kill_main_script
 
     cd /
     if [[ -z $(find_usbflash) ]]; then
@@ -43,7 +49,9 @@ DEFAULT_CONFIG=/boot/bydefault/default-config
 SCRIPTS=/boot/bydefault/scripts
 
 function handle_dir {
+    set -a
     source $DEFAULT_CONFIG
+    set +a
 
     echo "Load FS from $(pwd)"
 
@@ -56,7 +64,9 @@ function handle_dir {
     fi
 
     if [ -a "config" ]; then
+        set -a
         source ./config
+        set +a
         
         set-rw
         if [[ -n "${CONFIG_HOSTNAME}" ]]; then
@@ -104,11 +114,7 @@ function mount_flash {
         echo "$USBFLASH connected and mounted"
 
         # kill previous script
-        if ps -p $MAIN_SCRIPT > /dev/null; then
-            echo "kill $MAIN_SCRIPT"
-            kill $(list_descendants $MAIN_SCRIPT)
-            kill $MAIN_SCRIPT
-        fi
+        kill_main_script
 
         cd $USBFLASH_DIR
 
@@ -117,7 +123,7 @@ function mount_flash {
         # wait for process exists and flash inserted
         while ps -p $MAIN_SCRIPT > /dev/null && [[ ! -z $(find_usbflash) ]]; do
             sudo bash -c "echo 1 >/sys/class/leds/led0/brightness"
-            sleep 0.01s
+            sleep 0.2s
             sudo bash -c "echo 0 >/sys/class/leds/led0/brightness"
             sleep 2s
         done
@@ -154,11 +160,7 @@ function mount_flash {
             sleep 2s
         done
 
-        if ps -p $MAIN_SCRIPT > /dev/null; then
-            echo "kill $MAIN_SCRIPT"
-            kill $(list_descendants $MAIN_SCRIPT)
-            kill $MAIN_SCRIPT
-        fi
+        kill_main_script
     fi
 }
 

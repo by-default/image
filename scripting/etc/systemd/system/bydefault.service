@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Environment=DISPLAY=:0
-ExecStart=/bin/bash start.sh
-WorkingDirectory=/boot/bydefault
+ExecStart=/boot/bydefault/bydefault
+WorkingDirectory=/boot/bydefault/
 Restart=always
 RestartSec=2
 User=pi

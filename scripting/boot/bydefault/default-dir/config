@@ -1,1 +1,12 @@
 SCRIPT=blink
+# trigger
+# loop
+
+# for trigger script:
+# PLAY_COMMAND= # command for play (default aplaymidi)
+# PLAY_PARAM="" # play param (default -d 0 -p <midi device>)
+# PLAY_INTRO="" # name of file playing on startup (default intro.mid)
+# PLAY_IDLE_LOOP="" # name of file playing in loop on idle (default idle.mid)
+# PLAY_MAIN="" # name of folder with files playing by trigger (default main)
+# SENSOR="" # sensor GPIO (default 27)
+# RESET_TIMEOUT="" # timeout before reset main sequence (default 0s)
