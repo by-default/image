@@ -4,7 +4,7 @@ if [[ -z "${PLAY_COMMAND}" ]]; then
     PLAY_COMMAND=aplaymidi
 fi
 if [[ -z "${PLAY_PARAM}" ]]; then
-    PLAY_PARAM="-d 0 -p $(aplaymidi -l | grep ":" | grep -v "Midi Through" | cut -d " " -f 2)"
+    PLAY_PARAM="-d 0 -p $(aplaymidi -l | grep ":" | grep -v "Midi Through" | head -n 1 | cut -d " " -f 2)"
 fi
 if [[ -z "${PLAY_INTRO}" ]]; then
     PLAY_INTRO="intro.mid"
@@ -25,22 +25,22 @@ if [[ -z "${MASTER_HOST}" ]]; then
     MASTER_HOST="localhost"
 fi
 
+if [[ -z "${TRIGGER_HOST}" ]]; then
+    TRIGGER_HOST=$MASTER_HOST
+fi
+
 echo "Trigger script: $PLAY_COMMAND $PLAY_PARAM. Sensor: $SENSOR, timeout: $RESET_TIMEOUT"
 echo "Intro: $PLAY_INTRO Idle: $PLAY_IDLE_LOOP Main: $PLAY_MAIN"
-
-raspi-gpio set $SENSOR ip pd
-if [[ ! -d /sys/class/gpio/gpio$SENSOR ]]; then
-    echo $SENSOR >/sys/class/gpio/export
-fi
+echo "Master host: $MASTER_HOST Trigger host: $TRIGGER_HOST"
 
 function send_gpio {
     PREV_STATE="0"
     while true; do
-        STATE=$(cat /sys/class/gpio/gpio$SENSOR/value)
+        STATE=$(cat $SENSOR_FILE)
         if [[ $STATE != $PREV_STATE ]]; then
             echo "state changed to $STATE"
 
-            mosquitto_pub -h $MASTER_HOST -t "/$HOSTNAME/gpio/$SENSOR" -m $STATE
+            mosquitto_pub -h $MASTER_HOST -t "/$HOSTNAME/trigger" -m $STATE
             PREV_STATE=$STATE
         fi
 
@@ -48,7 +48,38 @@ function send_gpio {
     done
 }
 
-send_gpio &
+TMP_SENSOR_FILE="/tmp/bydefault-trigger-sensor"
+
+function receive_gpio {
+    echo "receiving gpio state"
+
+    echo "0" > $TMP_SENSOR_FILE
+    echo "tmp file: $(cat $TMP_SENSOR_FILE)"
+
+    while true; do
+        # TODO: master host not equal trigger source
+        STATE=$(mosquitto_sub -h $MASTER_HOST -t "/$TRIGGER_HOST/trigger" -C 1 -N)
+        echo "new state $STATE"
+        echo $STATE > $TMP_SENSOR_FILE
+        echo "get message $(cat $TMP_SENSOR_FILE)"
+    done
+}
+
+if [[ -n "${MQTT_SLAVE}" ]]; then
+    echo "run in mqtt slave mode"
+
+    SENSOR_FILE=$TMP_SENSOR_FILE
+    receive_gpio &
+else
+    echo "run in trigger master mode"
+    raspi-gpio set $SENSOR ip pd
+    if [[ ! -d /sys/class/gpio/gpio$SENSOR ]]; then
+        echo $SENSOR >/sys/class/gpio/export
+    fi
+
+    SENSOR_FILE="/sys/class/gpio/gpio$SENSOR/value"
+    send_gpio &
+fi
 
 $PLAY_COMMAND $PLAY_PARAM ./$PLAY_INTRO
 
@@ -70,11 +101,11 @@ list_descendants () {
 
 while true; do
     # play intro, wait for sensor
-    while [[ $(cat /sys/class/gpio/gpio$SENSOR/value) == "0" ]]; do
+    while [[ $(cat $SENSOR_FILE) == "0" ]]; do
         echo "play idle loop: $PLAY_IDLE_LOOP"
         play_idle_loop & IDLE_LOOP=$!
 
-        while [[ $(cat /sys/class/gpio/gpio$SENSOR/value) == "0" ]]; do sleep 0.2s; done
+        while [[ $(cat $SENSOR_FILE) == "0" ]]; do sleep 0.2s; done
         kill $(list_descendants $IDLE_LOOP)
         kill $IDLE_LOOP
     done
@@ -83,10 +114,10 @@ while true; do
     for f in ./$PLAY_MAIN/*.mid; do
         echo "play main: $f"
         $PLAY_COMMAND $PLAY_PARAM "$f"
-        if [[ $(cat /sys/class/gpio/gpio$SENSOR/value) == "0" ]]; then
+        if [[ $(cat $SENSOR_FILE) == "0" ]]; then
             echo "no sensor, wait for reset"
             sleep $RESET_TIMEOUT
-            if [[ $(cat /sys/class/gpio/gpio$SENSOR/value) == "0" ]]; then
+            if [[ $(cat $SENSOR_FILE) == "0" ]]; then
                 echo "reset sequence"
                 break
             fi
