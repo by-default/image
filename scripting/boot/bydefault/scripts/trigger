@@ -3,7 +3,7 @@ if [[ -z "${PLAY_COMMAND}" ]]; then
     PLAY_COMMAND=aplaymidi
 fi
 if [[ -z "${PLAY_PARAM}" ]]; then
-    PLAY_PARAM="-p $(aplaymidi -l | grep ":" | grep -v "Midi Through" | cut -d " " -f 2)"
+    PLAY_PARAM="-d 0 -p $(aplaymidi -l | grep ":" | grep -v "Midi Through" | cut -d " " -f 2)"
 fi
 if [[ -z "${PLAY_INTRO}" ]]; then
     PLAY_INTRO="intro.mid"
@@ -16,6 +16,9 @@ if [[ -z "${PLAY_MAIN}" ]]; then
 fi
 if [[ -z "${SENSOR}" ]]; then
     SENSOR="27"
+fi
+if [[ -z "${RESET_TIMEOUT}" ]]; then
+    RESET_TIMEOUT="0s"
 fi
 
 echo "Trigger script: $PLAY_COMMAND $PLAY_PARAM. Intro: $PLAY_INTRO. Main: $PLAY_MAIN. Sensor: $SENSOR"
@@ -33,6 +36,16 @@ function play_idle_loop {
     done
 }
 
+list_descendants () {
+  local children=$(ps -o pid= --ppid "$1")
+
+  for pid in $children; do
+    list_descendants "$pid"
+  done
+
+  echo "$children"
+}
+
 while true; do
     # play intro, wait for sensor
     while [[ $(cat /sys/class/gpio/gpio$SENSOR/value) == "0" ]]; do
@@ -40,6 +53,7 @@ while true; do
         play_idle_loop & IDLE_LOOP=$!
 
         while [[ $(cat /sys/class/gpio/gpio$SENSOR/value) == "0" ]]; do sleep 0.2s; done
+        kill $(list_descendants $IDLE_LOOP)
         kill $IDLE_LOOP
     done
 
@@ -48,7 +62,12 @@ while true; do
         echo "play main: $f"
         $PLAY_COMMAND $PLAY_PARAM "$f"
         if [[ $(cat /sys/class/gpio/gpio$SENSOR/value) == "0" ]]; then
-            break
+            echo "no sensor, wait for reset"
+            sleep $RESET_TIMEOUT
+            if [[ $(cat /sys/class/gpio/gpio$SENSOR/value) == "0" ]]; then
+                echo "reset sequence"
+                break
+            fi
         fi
     done
 done
