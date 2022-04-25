@@ -1,4 +1,5 @@
 #!/bin/bash
+
 if [[ -z "${PLAY_COMMAND}" ]]; then
     PLAY_COMMAND=aplaymidi
 fi
@@ -20,13 +21,34 @@ fi
 if [[ -z "${RESET_TIMEOUT}" ]]; then
     RESET_TIMEOUT="0s"
 fi
+if [[ -z "${MASTER_HOST}" ]]; then
+    MASTER_HOST="localhost"
+fi
 
-echo "Trigger script: $PLAY_COMMAND $PLAY_PARAM. Intro: $PLAY_INTRO. Main: $PLAY_MAIN. Sensor: $SENSOR"
+echo "Trigger script: $PLAY_COMMAND $PLAY_PARAM. Sensor: $SENSOR, timeout: $RESET_TIMEOUT"
+echo "Intro: $PLAY_INTRO Idle: $PLAY_IDLE_LOOP Main: $PLAY_MAIN"
 
 raspi-gpio set $SENSOR ip pd
 if [[ ! -d /sys/class/gpio/gpio$SENSOR ]]; then
     echo $SENSOR >/sys/class/gpio/export
 fi
+
+function send_gpio {
+    PREV_STATE="0"
+    while true; do
+        STATE=$(cat /sys/class/gpio/gpio$SENSOR/value)
+        if [[ $STATE != $PREV_STATE ]]; then
+            echo "state changed to $STATE"
+
+            mosquitto_pub -h $MASTER_HOST -t "/$HOSTNAME/gpio/$SENSOR" -m $STATE
+            PREV_STATE=$STATE
+        fi
+
+        sleep 0.1s
+    done
+}
+
+send_gpio &
 
 $PLAY_COMMAND $PLAY_PARAM ./$PLAY_INTRO
 
