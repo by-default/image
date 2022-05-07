@@ -22,7 +22,7 @@ if [[ ! -d /sys/class/gpio/gpio$PIN ]]; then
 fi
 
 while true; do
-	raspi-gpio set $LED_AP dl
+	raspi-gpio set $LED_STA dl
 	
     # wait for gpio pull and check network
     while [[ $(cat /sys/class/gpio/gpio$PIN/value) == "1" ]]; do
@@ -37,7 +37,7 @@ while true; do
     echo "go to ap"
     raspi-gpio set $LED_STA op dl
     switch-ap
-    raspi-gpio set $LED_AP dh
+    raspi-gpio set $LED_STA dh
 
     # wait for gpio release
     while [[ $(cat /sys/class/gpio/gpio$PIN/value) == "0" ]]; do
@@ -47,7 +47,7 @@ while true; do
         sleep 0.4s
     done
     echo "go to station mode"
-    raspi-gpio set $LED_AP dl
+    raspi-gpio set $LED_STA dl
     switch-sta
     
 
