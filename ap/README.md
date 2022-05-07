@@ -7,3 +7,5 @@
 Параметры точки доступа находятся в `/etc/hostapd/hostapd.conf`
 
 Параметры подключения клиента находятся в `/etc/wpa_supplicant/wpa_supplicant.conf`
+
+При подключении по ethernet обеспечивает доступ к интернету/сети через wifi
