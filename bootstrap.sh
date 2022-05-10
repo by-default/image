@@ -85,6 +85,14 @@ sudo ntpdate -s time.nist.gov
 curl -s https://install.zerotier.com | sudo bash
 sudo zerotier-cli join <network>
 
+# regenerate id
+rm /var/lib/zerotier-one/identity.public
+rm /var/lib/zerotier-one/identity.secret
+systemctl stop zerotier-one.service
+systemctl start zerotier-one.service
+zerotier-cli join YOURNETWORKID
+
+
 sudo apt install cups
 sudo usermod -a -G lpadmin pi
 #edit conf
