@@ -93,6 +93,12 @@ function handle_dir {
 
                 # TODO restart AP if AP is running
             fi
+
+            # join zerotier
+
+            if [[ -n "${CONFIG_ZEROTIER}" ]]; then
+                sudo zerotier-cli join $CONFIG_ZEROTIER
+            fi
         fi
         set-ro
     fi
