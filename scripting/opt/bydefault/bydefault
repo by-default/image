@@ -44,9 +44,9 @@ function ctrl_c() {
 sudo bash -c "echo none >/sys/class/leds/led0/trigger"
 
 USBFLASH_DIR=/usbflash
-DEFAULT_DIR=/boot/bydefault/default-dir
-DEFAULT_CONFIG=/boot/bydefault/default-config
-SCRIPTS=/boot/bydefault/scripts
+DEFAULT_DIR=/boot/bydefault/
+DEFAULT_CONFIG=/boot/bydefault/config
+SCRIPTS=/opt/bydefault/scripts
 
 function handle_dir {
     set -a
