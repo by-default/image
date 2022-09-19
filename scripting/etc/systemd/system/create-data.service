@@ -3,7 +3,7 @@ Description=create data partition
 
 [Service]
 Type=oneshot
-ExecStart=/boot/bydefault/create_data
+ExecStart=/opt/create_data
 
 [Install]
 WantedBy=multi-user.target

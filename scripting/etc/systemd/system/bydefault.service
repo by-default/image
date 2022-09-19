@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Environment=DISPLAY=:0
-ExecStart=/boot/bydefault/bydefault
-WorkingDirectory=/boot/bydefault/
+ExecStart=/opt/bydefault/bydefault
+WorkingDirectory=/opt/bydefault/
 Restart=always
 RestartSec=2
 User=pi
