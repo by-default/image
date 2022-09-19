@@ -92,7 +92,6 @@ systemctl stop zerotier-one.service
 systemctl start zerotier-one.service
 zerotier-cli join YOURNETWORKID
 
-
 sudo apt install cups
 sudo usermod -a -G lpadmin pi
 #edit conf
@@ -116,3 +115,9 @@ sudo apt install avahi-utils
 
 # chromium --kiosk --use-fake-ui-for-media-stream /data/ga-mimicry-cam.html
 # chromium --kiosk --start-fullscreen --incognito --noerrdialogs --disable-translate --no-first-run --disable-infobars --window-position=0,0 --window-size=1920,1100
+
+# 2.2 Puredata and osc
+
+sudo apt install puredata-* pd-mrpeach pd-ext13 pd-ggee pd-mrpeach pd-mrpeach-net pd-osc
+sudo pip3 install yaml pyyaml pyserial
+
