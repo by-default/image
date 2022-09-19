@@ -2,7 +2,7 @@
 
 #!/bin/bash
 
-PIN=19
+PIN=13
 LED_STA=10
 
 trap ctrl_c INT
@@ -22,7 +22,9 @@ if [[ ! -d /sys/class/gpio/gpio$PIN ]]; then
 fi
 
 while true; do
+    echo "go to station mode"
 	raspi-gpio set $LED_STA dl
+    switch-sta
 	
     # wait for gpio pull and check network
     while [[ $(cat /sys/class/gpio/gpio$PIN/value) == "1" ]]; do
@@ -46,10 +48,4 @@ while true; do
         raspi-gpio set $LED_STA dl
         sleep 0.4s
     done
-    echo "go to station mode"
-    raspi-gpio set $LED_STA dl
-    switch-sta
-    
-
-
 done
