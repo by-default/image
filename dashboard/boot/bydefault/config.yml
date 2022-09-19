@@ -2,7 +2,7 @@ textboxes:
   - title: Info
     position: [[0, 5], [35, 10]]
     rate-ms: 5000
-    sample: python3 dash.py ip eth0 && python3 dash.py ip wlan0 && python3 dash.py gw && xrandr | head -1
+    sample: python3 /boot/bydefault/dash.py ip eth0 && python3 /boot/bydefault/dash.py ip wlan0 && python3 /boot/bydefault/dash.py gw && xrandr | head -1
   - title: FS
     position: [[0, 15], [35, 25]]
     rate-ms: 5000

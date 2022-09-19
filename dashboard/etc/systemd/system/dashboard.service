@@ -4,7 +4,7 @@ After=graphical.target
 
 [Service]
 Environment=DISPLAY=:0
-WorkingDirectory=/boot/dashboard
+WorkingDirectory=/opt/
 ExecStartPre=/bin/sleep 5
 ExecStart=/bin/bash dashboard.sh
 StandardInput=tty

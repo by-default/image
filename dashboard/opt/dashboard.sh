@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PIN=4
+PIN=3
 
 trap ctrl_c INT
 function ctrl_c() {
@@ -28,7 +28,7 @@ while true; do
     LAST_TTY=`sudo fgconsole`
     MY_TTY=`tty | sed 's/\/dev\/tty//g'`
 
-    /usr/bin/sampler --config config.yml & DASHBOARD_PID=$!
+    /usr/bin/sampler --config /boot/bydefault/config.yml & DASHBOARD_PID=$!
     sudo chvt $MY_TTY
 
     # wait for gpio release
