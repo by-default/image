@@ -1,0 +1,13 @@
+[Unit]
+Description=AP/Sta switcher
+After=network.target
+
+[Service]
+ExecStart=/opt/switcher-daemon
+Restart=always
+RestartSec=2
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+
