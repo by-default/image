@@ -55,14 +55,6 @@ function handle_dir {
 
     echo "Load FS from $(pwd)"
 
-    if [ -a "wifi" ]; then
-        echo "update supplicant"
-        set-rw
-        sudo update-supplicant ./wifi
-        set-ro
-        sudo wpa_cli -i wlan0 reconfigure
-    fi
-
     if [ -a "config" ]; then
         set -a
         source ./config
@@ -93,12 +85,17 @@ function handle_dir {
 
                 # TODO restart AP if AP is running
             fi
+        fi
 
-            # join zerotier
+        # join zerotier
+        if [[ -n "${CONFIG_ZEROTIER}" ]]; then
+            sudo zerotier-cli join $CONFIG_ZEROTIER
+        fi
 
-            if [[ -n "${CONFIG_ZEROTIER}" ]]; then
-                sudo zerotier-cli join $CONFIG_ZEROTIER
-            fi
+        # update supplicant
+        if [[ -n "${CONFIG_SSID}" ]]; then
+            echo "add wifi network $CONFIG_SSID:$CONFIG_PSK"
+            sudo update-supplicant --ssid "${CONFIG_SSID}" --psk "${CONFIG_PSK}"
         fi
         set-ro
     fi

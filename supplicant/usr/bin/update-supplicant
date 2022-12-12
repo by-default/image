@@ -49,6 +49,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("i", help="input file", type=str, nargs='?')
 parser.add_argument("-s", help="supplicant file", default="/etc/wpa_supplicant/wpa_supplicant.conf")
 parser.add_argument("-t", help="template file", default="/etc/wpa_supplicant/wpa_supplicant.conf.template")
+
+parser.add_argument("--ssid", help="", type=str, nargs='?')
+parser.add_argument("--psk", help="input file", type=str, nargs='?')
+
 args = parser.parse_args()
 
 def get_input_network(filename):
@@ -93,7 +97,12 @@ all_networks, _ = get_supplicant(args.s)
 if args.i is not None:
     input_network = get_input_network(args.i)
 else:
-    input_network = None
+    if args.ssid is not None:
+        input_network = {"ssid": args.ssid, "priority": 1}
+        if args.psk is not None:
+            input_network["psk"] = args.psk
+    else:
+        input_network = None
 
 if input_network is None:
     updated = True
