@@ -121,3 +121,8 @@ sudo apt install avahi-utils
 sudo apt install puredata-* pd-mrpeach pd-ext13 pd-ggee pd-mrpeach pd-mrpeach-net pd-osc
 sudo pip3 install yaml pyyaml pyserial
 
+# 3.1 pgpio
+sudo apt-get install pigpio
+pip3 install pigpio
+sudo systemctl enable pigpiod
+
